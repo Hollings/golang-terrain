@@ -20,6 +20,7 @@ var (
     colorYellow = color.RGBA{255,250,205,255}
     colorWhite = color.RGBA{255,255,255,255}
     colorBrown = color.RGBA{139,69,19,255}
+    colorBlack = color.RGBA{0,0,0,255}
     zoom = 0.02 //smaller is more zoomed in
     height = 500
     width = 500
@@ -33,14 +34,15 @@ var (
         color.RGBA{255,250,205,255},
         color.RGBA{255,255,255,255},
         color.RGBA{139,69,19,255},
+        color.RGBA{0,0,0,255},
     }
 
 )
 
 func main() {
 	simp := opensimplex.New();
-
-    for step := 0; step < 200; step++ {
+    simp2 := opensimplex.New();
+    for step := 0; step < 2000; step++ {
         img := image.NewPaletted(image.Rect(0, 0, width, height), palette)
         images = append(images, img)
         delays = append(delays, 0)
@@ -50,12 +52,23 @@ func main() {
   
         for i := 0; i < height; i++ {
         	for q := 0; q < width; q++ {
-        		height := simp.Eval3(zoom*float64(q),zoom*float64(i+750),z)
-        		if(height > -.5){
-    		        img.Set(q, i, colorWhite)
-        		}else{
-    				img.Set(q, i, colorBlue)
-        		}
+
+                // "surface"
+                height := simp2.Eval3(zoom/1.5*float64(q),zoom/1.5*float64(i+750),z)
+                if (int((height+1)*100))>i {
+                    img.Set(q,i,colorBlue);
+                }else{
+                     // "caves"
+                    height := simp.Eval3(zoom*float64(q),zoom*float64(i+750),z)
+                    if(height > -.5){
+                        img.Set(q, i, colorWhite)
+                    }else{
+                        img.Set(q, i, colorBlack)
+                    }
+                }
+
+               
+
         	}
         }
     }
