@@ -21,9 +21,12 @@ var (
     colorWhite = color.RGBA{255,255,255,255}
     colorBrown = color.RGBA{139,69,19,255}
     colorBlack = color.RGBA{0,0,0,255}
-    zoom = 0.02 //smaller is more zoomed in
-    height = 500
-    width = 500
+    frames = 2000 // How many frames to render
+    fineAmplitude = 5.0 // I should think of different names for these. it just controls how "intense" the small and large 
+    largeAmplitude = 100.0 // features are
+    zoom = 0.04 //smaller is more zoomed in
+    imageHeight = 500
+    imageWidth = 500
     z = 0.00
     images []*image.Paletted
     delays []int
@@ -42,20 +45,23 @@ var (
 func main() {
 	simp := opensimplex.New();
     simp2 := opensimplex.New();
-    for step := 0; step < 2000; step++ {
-        img := image.NewPaletted(image.Rect(0, 0, width, height), palette)
+    for step := 0; step < frames; step++ {
+        img := image.NewPaletted(image.Rect(0, 0, imageWidth, imageHeight), palette)
         images = append(images, img)
         delays = append(delays, 0)
         z+=0.01
 
         // drawing code (too long)
   
-        for i := 0; i < height; i++ {
-        	for q := 0; q < width; q++ {
+        for i := 0; i < imageHeight; i++ {
+        	for q := 0; q < imageWidth; q++ {
 
                 // "surface"
-                height := simp2.Eval3(zoom/1.5*float64(q),zoom/1.5*float64(i+750),z)
-                if (int((height+1)*100))>i {
+                height := simp2.Eval3(zoom/2*float64(q),zoom/2*float64(i+750),z)
+                height2 := simp2.Eval3(zoom*2*float64(q),zoom*2*float64(i+750),z+9999)
+
+    
+                if (int( height2 * fineAmplitude) + int( height * largeAmplitude  ) > i-int(largeAmplitude)) {
                     img.Set(q,i,colorBlue);
                 }else{
                      // "caves"
