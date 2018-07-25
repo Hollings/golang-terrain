@@ -18,27 +18,31 @@ var (
     colorWhite = color.RGBA{255,255,255,255}
     colorBrown = color.RGBA{139,69,19,255}
     colorDarkGrey = color.RGBA{100,100,100,255}
+    colorLightGrey = color.RGBA{200,200,200,255}
     colorDarkBrown = color.RGBA{100,60,10,255}
     colorBlack = color.RGBA{0,0,0,255}
-
+    baseSmoothness = 1.0;
 )
 
 func main() {
 	fmt.Println("starting")
     img := image.NewRGBA(image.Rect(0, 0, 1000, 1000))
+
+    // Fill the canvas with black
     for i := 0; i < 1000; i++ {
     	for q := 0; q < 1000; q++ {
 			img.Set(i,q,colorBlack)        		
     	}
     }
+
     for o := 50; o < 1000; o+=50 {
-	   
-	    baseHeight := rand.Intn(50)+10
-	   	candleWidth := rand.Intn(10)*2
+
+	    baseHeight := rand.Intn(100)+10
+	   	candleWidth := rand.Intn(20)
 	    candleHeight := rand.Intn(100)
+	    // These are for later
 	    //wickHeight := rand.Intn(10)
 	    //flameHeight := rand.Intn(10)
-
 	    //candleBoundsX = candleWidth
 	    //candleBoundsY = candleHeight + baseHeight + wickHeight + flameHeight
 	    
@@ -47,12 +51,13 @@ func main() {
 	    // Create the waxy part of the candle
 	    for z := 0; z < candleHeight; z++ {
 	    	for i := candleWidth; i > 0; i-- {
-	    		if i<2{
-				img.Set(o+i+2,51-z,colorDarkGrey)    	
-	    		}else{
-				img.Set(o+i+2,51-z,colorGrey)    	
 
-	    		}
+	    		// Creates a smooth gradient from 100 - 150
+	    		// Im not sure if I like how non-pixel art this looks
+				img.Set(o+i+2,51-z,color.RGBA{uint8(150.0-50.0*(float32(i)/float32(candleWidth))),
+											  uint8(150.0-50.0*(float32(i)/float32(candleWidth))),
+											  uint8(150.0-50.0*(float32(i)/float32(candleWidth))),255})    
+
 	    	}
 	    }
 
@@ -63,36 +68,41 @@ func main() {
 	   
 
 	    // Randomly shape the candle holder thing
+
+	    // Set the location of left and right edge
 	    currentSides := [2]int{3+o,o+2+candleWidth}
 	    lastDirection := 0.0;
 	    lastColor := colorBrown;
-	  	simp := opensimplex.NewWithSeed(int64(o+1241512));
+	  	simp := opensimplex.NewWithSeed(int64(o+1212));
 
+	  	// Use the simplex noise to random walk the edges for the entire height of the base.
+	  	// I'm using 0.3 and -0.3 as the threshold for left and right. Might smooth it out more.
 	    for i := 0; i < baseHeight; i++ {
-	   
-	   		direction := simp.Eval2(float64(i),0.0)
+	   		direction := simp.Eval2(baseSmoothness * float64(i),0.0)
+
+	   		// If theres a sharp edge, add a darker line thats supposed to look like a shadow
 	    	if (((lastDirection < 0 && direction > 0 ) ||  (lastDirection > 0 && direction < 0))&& lastColor!=colorDarkBrown) {
-	    		img.Set(currentSides[0],51+i,colorDarkBrown)    	
-	    		img.Set(currentSides[1],51+i,colorDarkBrown)
-	    		for z := currentSides[0]; z < currentSides[1]; z++ {
-	    			img.Set(z,51+i,colorDarkBrown)    	
-	    		}
 	    		lastColor = colorDarkBrown
 	    	}else{
-	    		img.Set(currentSides[0],51+i,colorBrown)    	
-	    		img.Set(currentSides[1],51+i,colorBrown)
-	    		for z := currentSides[0]; z < currentSides[1]; z++ {
-	    			img.Set(z,51+i,colorBrown)    	
-	    		}
 	    		lastColor = colorBrown
 	    	}
 
+	    	// Set the outline
+    		img.Set(currentSides[0],51+i,colorBrown)    	
+    		img.Set(currentSides[1],51+i,colorDarkBrown)
+
+    		// Set the fill
+    		for z := currentSides[0]+1; z < currentSides[1]; z++ {
+    			img.Set(z,51+i,lastColor)    	
+    		}
 	    	lastDirection = direction
 
-
-	   		if direction > 0.3 {
+	    	// Move in the random direction if the candle isn't at mininmum width
+	    	if currentSides[1] - currentSides[0] <= 5  {
+	    		currentSides[0],currentSides[1] = currentSides[0]-1,currentSides[1]+1
+	    	}else if direction > 0.5 {
 	   			currentSides[0],currentSides[1] = currentSides[0]-1,currentSides[1]+1
-	   		}else if direction < -0.3{
+	   		}else if direction < -0.5{
 	   			currentSides[0],currentSides[1] = currentSides[0]+1,currentSides[1]-1
 	   		}
 
