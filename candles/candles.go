@@ -45,8 +45,8 @@ func main() {
 
     for o := 50; o < 1000; o+=50 {
 	    baseHeight := rand.Intn(25)+10
-	   	candleWidth := rand.Intn(15)
-	    candleHeight := rand.Intn(50)
+	   	candleWidth := rand.Intn(15)+1
+	    candleHeight := rand.Intn(50)+1
 	    // These are for later
 	    wickHeight := rand.Intn(10)
 	    flameAmount := rand.Intn(3)+1
@@ -79,8 +79,12 @@ func main() {
 	    }
 
 	    // Create Flame
-	    for i := 0; i < flameAmount; i++ {
-			img.Set(o+(candleWidth/2)+3,(originHeight+1)-(i+wickHeight+candleHeight),colorYellow)    	
+	    for i := 0; i <= flameAmount; i++ {
+	    	if i==flameAmount {
+	    		img.Set(o+(candleWidth/2)+2,(originHeight+1)-(i+wickHeight+candleHeight),colorYellow)    	
+	    	}else{
+				img.Set(o+(candleWidth/2)+3,(originHeight+1)-(i+wickHeight+candleHeight),colorYellow)    	
+	    	}
 	    }
 
 	    // Randomly shape the candle holder thing
