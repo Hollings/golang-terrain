@@ -4,6 +4,7 @@ import (
     "image"
     "image/color"
     "image/png"
+    "math"
     // "reflect"
     // "math/rand"
     "os"
@@ -62,8 +63,8 @@ func main() {
 
                 // "surface"
                 height := simp2.Eval3(zoom/2*float64(q),zoom/2*float64(i+750),z)
-                height2 := simp2.Eval3(zoom*2*float64(q),zoom*2*float64(i+750),z+9999)
-                caveSimp := simp.Eval3(zoom*float64(q),zoom*float64(i+750),z)
+                height2 := math.Abs(simp2.Eval3(zoom*2*float64(q),zoom*2*float64(i+750),z+9999))
+                caveSimp := (simp.Eval3(zoom*float64(q),zoom*float64(i+750),z) - height2) / 2
 
         
                 if (int( height2 * fineAmplitude) + int( height * largeAmplitude  ) > i-int(largeAmplitude)) {
@@ -88,9 +89,16 @@ func main() {
                     if(caveSimp > caveAmount){
 
                         // SOLID GROUND
-                        img.Set(q+step,i+step,color.RGBA{uint8(210.0*(float32(n)/float32(frames))),
+                        if q < 3 {
+                        	img.Set(q+step,i+step,color.RGBA{uint8(210.0*(float32(n)/float32(frames))),
                                                          uint8(180.0*(float32(n)/float32(frames))),
                                                          uint8(140.0*(float32(n)/float32(frames))),255});
+                        }else{
+                        	 img.Set(q+step,i+step,color.RGBA{uint8(210.0*(float32(n-50)/float32(frames))),
+                                                         uint8(180.0*(float32(n-50)/float32(frames))),
+                                                         uint8(140.0*(float32(n-50)/float32(frames))),255});
+                        }
+                       
                     }
                 }
 
