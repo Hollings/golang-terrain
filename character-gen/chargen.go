@@ -25,13 +25,54 @@ type sylList struct {
 	end []string
 }
 
-func generateNameFromFile(fileName string, length int, amount int) [50]string{
+
+func getOrCreateNames() string {
+    file1, err1 := os.Open("generatedNames.txt")
+    fullName := ""
+    if err1 != nil {
+        // If names file doesn't exist, generate one
+        file, err := os.Create("generatedNames.txt")
+        if err != nil {
+            log.Fatal("Cannot create file", err)
+        }
+        defer file.Close()
+        // createFile("generatedNames.txt")
+        firstNames :=  generateNamesFromFile("names.txt",3)
+        lastNames := generateNamesFromFile("last.txt",5)
+
+        // for i := 0; i < 100; i++ {
+        //     fmt.Print(firstNames[i] + " ")
+        //     fmt.Println(lastNames[i])
+        // }
+        // createFile("generatedNames.txt")
+        // file, err := os.Open("generatedNames.txt")
+        // if err != nil {
+           
+
+        // defer file.Close()
+
+        for i := 0; i < 10000; i++ {
+            fmt.Print(firstNames[i] + " ")
+            fmt.Println(lastNames[i])
+            fmt.Fprintf(file,firstNames[i] + " " + lastNames[i] + "\n")
+        }
+        fullName = firstNames[10] + " " + lastNames[10] 
+        
+    }else{
+        // If names file exists already, just pull a random line from it
+        fullName = randomLine("generatedNames.txt")
+        
+    }
+    defer file1.Close()
+    return fullName
+}
+
+func generateNamesFromFile(fileName string, length int) [10000]string{
 	file, err := os.Open(fileName)
     if err != nil {
         log.Fatal(err)
     }
     defer file.Close()
-
     scanner := bufio.NewScanner(file)
     var sylList sylList
     for scanner.Scan() {
@@ -46,9 +87,8 @@ func generateNameFromFile(fileName string, length int, amount int) [50]string{
         	sylList.end = append(sylList.end, element)
 		}
     }
-
-    var returnArray [50]string 
-    for i := 0; i < amount; i++ {
+    var returnArray [10000]string 
+    for i := 0; i < 10000; i++ {
     	returnArray[i] = ""
 	    returnArray[i] += (strings.Title(strings.ToLower(sylList.start[rand.Intn(len(sylList.start))])))
 	    for i := 0; i < rand.Intn(length); i++ {
@@ -56,9 +96,9 @@ func generateNameFromFile(fileName string, length int, amount int) [50]string{
 	    }
 	    returnArray[i] += (strings.ToLower(strings.ToLower(sylList.end[rand.Intn(len(sylList.end))]))	)
     }
-
     return returnArray
 }
+
 func splitSyl(name string) sylList{ 
 	// Splits a string into syllables
 	var startSyllables []string
@@ -104,19 +144,17 @@ func randomLine(fileName string) string{
 func main() {
 	rand.Seed(time.Now().Unix()) // initialize global pseudo random generator
 	
-	firstNames :=  generateNameFromFile("first.txt",2,5)
-    lastNames := generateNameFromFile("last.txt",3,5)
 
     for i := 0; i < 5; i++ {
-	    fullName := firstNames[i] + " " + lastNames[i] 
+	    //fullName := firstNames[i] + " " + lastNames[i] 
 	    
-	    fmt.Println("---")
 
+        fullName := getOrCreateNames()
+        fmt.Println("---")
 	   	fmt.Println(fullName)
 	   	fmt.Println("the "+ randomLine("adverbs.txt") + " " + randomLine("adjectives.txt") +" "+[]string{0:"Male",1:"Female"}[rand.Intn(2)] + " " + randomLine("races.txt"))
-	   	fmt.Println("likes " + randomLine("verbs.txt"))
-	  	fmt.Println("hates " + randomLine("verbs.txt"))
-	   	fmt.Println("hates " + randomLine("verbs.txt"))
+	   // 	fmt.Println("likes " + randomLine("verbs.txt"))
+	  	// fmt.Println("hates " + randomLine("verbs.txt"))
 
     }
     fmt.Println("---")	
