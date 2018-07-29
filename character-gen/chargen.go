@@ -25,7 +25,7 @@ type sylList struct {
 	end []string
 }
 
-func generateNameFromFile(fileName string, length int) [15]string{
+func generateNameFromFile(fileName string, length int, amount int) [50]string{
 	file, err := os.Open(fileName)
     if err != nil {
         log.Fatal(err)
@@ -47,8 +47,8 @@ func generateNameFromFile(fileName string, length int) [15]string{
 		}
     }
 
-    var returnArray [15]string 
-    for i := 0; i < 15; i++ {
+    var returnArray [50]string 
+    for i := 0; i < amount; i++ {
     	returnArray[i] = ""
 	    returnArray[i] += (strings.Title(strings.ToLower(sylList.start[rand.Intn(len(sylList.start))])))
 	    for i := 0; i < rand.Intn(length); i++ {
@@ -83,23 +83,43 @@ func splitSyl(name string) sylList{
 	returns := sylList{start: startSyllables,middle: syllables,end:endSyllables}
 	return returns
 }
+func randomLine(fileName string) string{
+	file, err := os.Open(fileName)
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer file.Close()
+
+    scanner := bufio.NewScanner(file)
+    var lines []string
+    for scanner.Scan() {
+        lines = append(lines, string(scanner.Text()))
+    }
+    chosenLine := lines[rand.Intn(len(lines))]
+    return chosenLine
+}
 
 
 
 func main() {
 	rand.Seed(time.Now().Unix()) // initialize global pseudo random generator
 	
-	firstNames :=  generateNameFromFile("names.txt",2)
-    lastNames := generateNameFromFile("last.txt",3)
+	firstNames :=  generateNameFromFile("first.txt",2,5)
+    lastNames := generateNameFromFile("last.txt",3,5)
 
-    for i := 0; i < 15; i++ {
-    	fmt.Print(firstNames[i] + " ")
-    	fmt.Println(lastNames[i])
+    for i := 0; i < 5; i++ {
+	    fullName := firstNames[i] + " " + lastNames[i] 
+	    
+	    fmt.Println("---")
+
+	   	fmt.Println(fullName)
+	   	fmt.Println("the "+ randomLine("adverbs.txt") + " " + randomLine("adjectives.txt") +" "+[]string{0:"Male",1:"Female"}[rand.Intn(2)] + " " + randomLine("races.txt"))
+	   	fmt.Println("likes " + randomLine("verbs.txt"))
+	  	fmt.Println("hates " + randomLine("verbs.txt"))
+	   	fmt.Println("hates " + randomLine("verbs.txt"))
+
     }
-
-
-    fmt.Println("---")
-    
+    fmt.Println("---")	
 
     // fmt.Print(allSyllables[rand.Intn(len(allSyllables))])
     // fmt.Print(allSyllables[rand.Intn(len(allSyllables))])
