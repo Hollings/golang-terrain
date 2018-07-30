@@ -152,7 +152,7 @@ func main() {
         fullName := getOrCreateNames()
         fmt.Println("---")
 	   	fmt.Println(fullName)
-	   	fmt.Println("the "+ randomLine("adverbs.txt") + " " + randomLine("adjectives.txt") +" "+[]string{0:"Male",1:"Female"}[rand.Intn(2)] + " " + randomLine("races.txt"))
+	   	fmt.Println("The "+ randomLine("adverbs.txt") + " " + randomLine("adjectives.txt") +" "+[]string{0:"Male",1:"Female"}[rand.Intn(2)] + " " + randomLine("races.txt"))
 	   // 	fmt.Println("likes " + randomLine("verbs.txt"))
 	  	// fmt.Println("hates " + randomLine("verbs.txt"))
 
